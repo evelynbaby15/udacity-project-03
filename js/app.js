@@ -2,6 +2,10 @@ var xRange = 4;
 var yRange = 5;
 const GRID_WIDTH=101;
 const GRID_HEIGHT=83;
+
+const PLAYER_START_xGrid = 2;
+const PLAYER_START_yGrid = 5;
+
 // TODO:
 // const RACE = [10, 30, 100];
 
@@ -34,7 +38,7 @@ Enemy.prototype.update = function(dt) {
     }
     this.x += this.randomX * dt;
 
-    // console.log("em x:", this.x, ", dt:", dt, ", em y:", this.y);
+    // this.x = 100;
 };
 
 // Draw the enemy on the screen, required method for game
@@ -53,8 +57,8 @@ var Player = function() {
     this.yMoveUnit = GRID_HEIGHT;
 
     // Player start point
-    this.xGrid = 2;
-    this.yGrid = 5;
+    this.xGrid = PLAYER_START_xGrid;
+    this.yGrid = PLAYER_START_yGrid;
 
     // Player start position
     this.x = this.xGrid * this.xMoveUnit;
@@ -66,6 +70,12 @@ Player.prototype.update = function() {
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
+Player.prototype.backToStart = function() {
+    this.xGrid = PLAYER_START_xGrid;
+    this.yGrid = PLAYER_START_yGrid;
+    this.x = this.xGrid * this.xMoveUnit;
+    this.y = this.yGrid * this.yMoveUnit;
+}
 Player.prototype.handleInput = function(moveDirection) {
     // console.log("xgrid:", this.xGrid, ", ygrid:", this.yGrid);
     switch (moveDirection) {
@@ -98,7 +108,7 @@ Player.prototype.handleInput = function(moveDirection) {
 // Place the player object in a variable called player
 var allEnemies = [];
 allEnemies.push(new Enemy());
-allEnemies.push(new Enemy());
+// allEnemies.push(new Enemy());
 
 var player = new Player();
 
@@ -120,4 +130,75 @@ function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function checkCollisions() {
+      for(enemy of allEnemies) {
+        if(player.isCollision(enemy)) {
+            console.log("collision happend!");
+            // reset player back to start position
+            player.backToStart();
+        }
+    }
+
+}
+
+Player.prototype.isCollision = function(enemy) {
+    // Set default value for dectection, e.g.
+    // bug-enemy dectecion size: 80 * 150
+    // player dectection size: 90 * 160
+    const eneW = 99;
+    const eneH = 80;
+    const playW = 99;
+    const playH = 80;
+
+    let xClash = false;
+    let yClash = false;
+
+    // Player's xy
+    const x1 = this.x;
+    const x2 = this.x + playW;
+
+    const y1 = this.y;
+    const y2 = this.y + playH;
+
+    // Enemy's xy
+    const ex1 = enemy.x;
+    const ex2 = enemy.x + eneW;
+
+    const ey1 = enemy.y + 20;
+    const ey2 = enemy.y + eneH + 20;
+
+    console.log("(x1, y1):", x1, y1);
+    console.log("(ex1, ey1):", ex1, ey1);
+
+    // 1.top-left point
+    if(x1 >= ex1 && x1 <= ex2) {
+        if(y1 >= ey1 && y1 <= ey2) {
+            xClash = true;
+            //console.log(`(x1,y1):(${x1}, ${y1}) is in `, ex1);
+        }
+    }
+
+    // 2.top-right point
+    if(x2 >= ex1 && x2 <= ex2) {
+        if(y1 >= ey1 && y1 <= ey2) {
+            xClash = true;
+        }
+    }
+
+    // 3.button-left point
+    if(x1 >= ex1 && x1 <= ex2) {
+        if(y2 >= ey1 && y2 <= ey2) {
+            yClash = true;
+        }
+    }
+
+    // 4.button-right point
+    if(x2 >= ex1 && x2 <= ex2) {
+        if(y2 >= ey1 && y2 <= ey2) {
+            yClash = true;
+        }
+    }
+    return xClash || yClash;
 }
