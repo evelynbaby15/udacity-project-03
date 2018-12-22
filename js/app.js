@@ -1,3 +1,10 @@
+var xRange = 4;
+var yRange = 5;
+const GRID_WIDTH=101;
+const GRID_HEIGHT=83;
+// TODO:
+// const RACE = [10, 30, 100];
+
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -6,6 +13,13 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+
+    let randomY = getRandomInt(1, 4);
+    console.log("randomY:", randomY);
+    this.randomX = getRandomInt(20, 300);
+
+    this.x = -GRID_WIDTH;
+    this.y = randomY * GRID_HEIGHT - 20;
 };
 
 // Update the enemy's position, required method for game
@@ -14,6 +28,13 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+
+    if(this.x > (xRange +1) * GRID_WIDTH) {
+        this.x = -GRID_WIDTH;
+    }
+    this.x += this.randomX * dt;
+
+    // console.log("em x:", this.x, ", dt:", dt, ", em y:", this.y);
 };
 
 // Draw the enemy on the screen, required method for game
@@ -24,12 +45,62 @@ Enemy.prototype.render = function() {
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
+var Player = function() {
+    // TODO: Let user choose character.
+    this.sprite = 'images/char-pink-girl.png';
+
+    this.xMoveUnit = GRID_WIDTH;
+    this.yMoveUnit = GRID_HEIGHT;
+
+    // Player start point
+    this.xGrid = 2;
+    this.yGrid = 5;
+
+    // Player start position
+    this.x = this.xGrid * this.xMoveUnit;
+    this.y = this.yGrid * this.yMoveUnit;
+};
+Player.prototype.update = function() {
+    // console.log('Player update');
+};
+Player.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+Player.prototype.handleInput = function(moveDirection) {
+    // console.log("xgrid:", this.xGrid, ", ygrid:", this.yGrid);
+    switch (moveDirection) {
+        case 'left':
+            this.xGrid = this.xGrid - 1 < 0 ? this.xGrid : (this.xGrid -1);
+            this.x = this.xGrid * this.xMoveUnit;
+            break;
+        case 'up':
+            this.yGrid = this.yGrid - 1 < 0 ? this.yGrid: (this.yGrid - 1);
+            this.y = this.yGrid * this.yMoveUnit;
+            break;
+        case 'right':
+            this.xGrid = this.xGrid + 1 > xRange ? this.xGrid : (this.xGrid +1);
+            this.x = this.xGrid * this.xMoveUnit;
+            break;
+        case 'down':
+            this.yGrid = this.yGrid + 1 > yRange ? this.yGrid : (this.yGrid +1);
+            this.y = this.yGrid * this.yMoveUnit;
+            break;     
+        default:
+            console.log("Can't go.");
+            break;
+    }
+};
+
 
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
+var allEnemies = [];
+allEnemies.push(new Enemy());
+allEnemies.push(new Enemy());
 
+var player = new Player();
 
 
 // This listens for key presses and sends the keys to your
@@ -44,3 +115,9 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
