@@ -1,10 +1,20 @@
 var xRange = 4;
 var yRange = 5;
-const GRID_WIDTH=101;
-const GRID_HEIGHT=83;
+const GRID_WIDTH = 101;
+const GRID_HEIGHT = 83;
 
 const PLAYER_START_xGrid = 2;
 const PLAYER_START_yGrid = 5;
+
+var currentSelectIndex = 0;
+var charLen;
+
+const DECTECT_W = 99;
+const DECTECT_H = 80;
+
+var score = 0;
+
+// var selectedChar = '';
 
 // TODO:
 // const RACE = [10, 30, 100];
@@ -16,10 +26,11 @@ var Enemy = function() {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
+   
     this.sprite = 'images/enemy-bug.png';
-
+    
     let randomY = getRandomInt(1, 4);
-    console.log("randomY:", randomY);
+    // console.log("randomY:", randomY);
     this.randomX = getRandomInt(20, 300);
 
     this.x = -GRID_WIDTH;
@@ -44,6 +55,7 @@ Enemy.prototype.update = function(dt) {
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    // ctx.strokeRect(this.x, this.y + 20, DECTECT_W, DECTECT_H);
 };
 
 // Now write your own player class
@@ -69,6 +81,7 @@ Player.prototype.update = function() {
 };
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    // ctx.strokeRect(this.x, this.y, DECTECT_W, DECTECT_H);
 };
 Player.prototype.backToStart = function() {
     this.xGrid = PLAYER_START_xGrid;
@@ -86,6 +99,18 @@ Player.prototype.handleInput = function(moveDirection) {
         case 'up':
             this.yGrid = this.yGrid - 1 < 0 ? this.yGrid: (this.yGrid - 1);
             this.y = this.yGrid * this.yMoveUnit;
+            // win
+            if(this.yGrid == 0) {
+                // console.log("yGrid:", this.yGrid);
+                document.getElementById("score").textContent = "Congratulations~~~ You win!";
+                score++;
+                setTimeout(() => {
+                    document.getElementById("score").textContent = score;
+                    player.backToStart();
+                }, 1000);
+                
+            }
+
             break;
         case 'right':
             this.xGrid = this.xGrid + 1 > xRange ? this.xGrid : (this.xGrid +1);
@@ -108,7 +133,8 @@ Player.prototype.handleInput = function(moveDirection) {
 // Place the player object in a variable called player
 var allEnemies = [];
 allEnemies.push(new Enemy());
-// allEnemies.push(new Enemy());
+allEnemies.push(new Enemy());
+allEnemies.push(new Enemy());
 
 var player = new Player();
 
@@ -124,6 +150,7 @@ document.addEventListener('keyup', function(e) {
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
+
 });
 
 function getRandomInt(min, max) {
@@ -147,30 +174,26 @@ Player.prototype.isCollision = function(enemy) {
     // Set default value for dectection, e.g.
     // bug-enemy dectecion size: 80 * 150
     // player dectection size: 90 * 160
-    const eneW = 99;
-    const eneH = 80;
-    const playW = 99;
-    const playH = 80;
 
     let xClash = false;
     let yClash = false;
 
     // Player's xy
     const x1 = this.x;
-    const x2 = this.x + playW;
+    const x2 = this.x + DECTECT_W;
 
     const y1 = this.y;
-    const y2 = this.y + playH;
+    const y2 = this.y + DECTECT_H;
 
     // Enemy's xy
     const ex1 = enemy.x;
-    const ex2 = enemy.x + eneW;
+    const ex2 = enemy.x + DECTECT_W;
 
     const ey1 = enemy.y + 20;
-    const ey2 = enemy.y + eneH + 20;
+    const ey2 = enemy.y + DECTECT_H + 20;
 
-    console.log("(x1, y1):", x1, y1);
-    console.log("(ex1, ey1):", ex1, ey1);
+    // console.log("(x1, y1):", x1, y1);
+    // console.log("(ex1, ey1):", ex1, ey1);
 
     // 1.top-left point
     if(x1 >= ex1 && x1 <= ex2) {
@@ -201,4 +224,64 @@ Player.prototype.isCollision = function(enemy) {
         }
     }
     return xClash || yClash;
+}
+/** 
+ * Choose character.
+*/
+function clickChar(img){
+    player.sprite = img;
+    document.querySelector(".sec-choose-char").style.display = "none";
+    document.getElementById("score-div").style.display = "block";
+    init(); // FIXME: When 'enter' clicked invoke it.
+}
+
+window.onload = function() {
+    document.addEventListener('keyup', changeSelectedCharacterCSS, false);
+
+    const charters = document.querySelectorAll(".sec-choose-char img");
+    charLen = charters.length;
+
+    charters[currentSelectIndex].focus();
+    charters[currentSelectIndex].classList.add("choose");
+
+    document.getElementById("score-div").style.display = "none";
+   
+}
+
+function changeSelectedCharacterCSS(e) {
+    const charters = document.querySelectorAll(".sec-choose-char img");
+
+    switch (e.key) {
+        case 'ArrowLeft':
+            if(currentSelectIndex > 0) {
+                currentSelectIndex--;
+            } else {
+                currentSelectIndex = charLen - 1;
+            }
+            charters[currentSelectIndex].focus();
+            charters[currentSelectIndex].classList.add("choose");
+            break;
+        case 'ArrowRight':
+            if(currentSelectIndex < charLen - 1) {
+                currentSelectIndex++;
+            } else {
+                currentSelectIndex = 0;
+            }
+            charters[currentSelectIndex].focus();
+            charters[currentSelectIndex].classList.add("choose");
+            break;
+        case 'Enter':
+            // console.log("enter img src:", charters[currentSelectIndex].getAttribute("data-role"));
+            clickChar(charters[currentSelectIndex].getAttribute("data-role"));
+            break;
+        default:
+            break;
+    }
+
+    charters.forEach((ele, i) => {
+        if(currentSelectIndex != i) {
+            ele.classList.remove("choose");
+        }
+    });
+    // console.log("currentSelectIndex:", currentSelectIndex);
 }
