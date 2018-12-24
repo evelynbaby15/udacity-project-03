@@ -1,5 +1,6 @@
 var xRange = 4;
 var yRange = 5;
+
 const GRID_WIDTH = 101;
 const GRID_HEIGHT = 83;
 
@@ -16,7 +17,7 @@ var score = 0;
 
 // var selectedChar = '';
 
-// TODO:
+// TODO: 調整蟲蟲速度
 // const RACE = [10, 30, 100];
 
 // Enemies our player must avoid
@@ -30,7 +31,6 @@ var Enemy = function() {
     this.sprite = 'images/enemy-bug.png';
     
     let randomY = getRandomInt(1, 4);
-    // console.log("randomY:", randomY);
     this.randomX = getRandomInt(20, 300);
 
     this.x = -GRID_WIDTH;
@@ -55,14 +55,14 @@ Enemy.prototype.update = function(dt) {
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    // ctx.strokeRect(this.x, this.y + 20, DECTECT_W, DECTECT_H);
+    ctx.strokeRect(this.x, this.y + 20, DECTECT_W, DECTECT_H);
 };
 
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-    // TODO: Let user choose character.
+    // default character
     this.sprite = 'images/char-pink-girl.png';
 
     this.xMoveUnit = GRID_WIDTH;
@@ -81,7 +81,7 @@ Player.prototype.update = function() {
 };
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    // ctx.strokeRect(this.x, this.y, DECTECT_W, DECTECT_H);
+    ctx.strokeRect(this.x, this.y, DECTECT_W, DECTECT_H);
 };
 Player.prototype.backToStart = function() {
     this.xGrid = PLAYER_START_xGrid;
@@ -223,7 +223,7 @@ Player.prototype.isCollision = function(enemy) {
             yClash = true;
         }
     }
-    return xClash || yClash;
+    return xClash || yClash; // FIXME: 有點怪怪的？
 }
 /** 
  * Choose character.
@@ -232,7 +232,7 @@ function clickChar(img){
     player.sprite = img;
     document.querySelector(".sec-choose-char").style.display = "none";
     document.getElementById("score-div").style.display = "block";
-    init(); // FIXME: When 'enter' clicked invoke it.
+    init();
 }
 
 window.onload = function() {
