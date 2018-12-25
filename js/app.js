@@ -1,3 +1,4 @@
+'use strict';
 var xRange = 4;
 var yRange = 5;
 
@@ -160,7 +161,7 @@ function getRandomInt(min, max) {
 }
 
 function checkCollisions() {
-      for(enemy of allEnemies) {
+      for(var enemy of allEnemies) {
         if(player.isCollision(enemy)) {
             console.log("collision happend!");
             // reset player back to start position
@@ -223,7 +224,7 @@ Player.prototype.isCollision = function(enemy) {
             yClash = true;
         }
     }
-    return xClash || yClash; // FIXME: 有點怪怪的？
+    return xClash && yClash; // FIXME: 有點怪怪的？
 }
 /** 
  * Choose character.
