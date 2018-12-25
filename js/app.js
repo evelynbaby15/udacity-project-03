@@ -16,8 +16,6 @@ const DECTECT_H = 80;
 
 var score = 0;
 
-// var selectedChar = '';
-
 // TODO: 調整蟲蟲速度
 // const RACE = [10, 30, 100];
 
@@ -224,7 +222,7 @@ Player.prototype.isCollision = function(enemy) {
             yClash = true;
         }
     }
-    return xClash && yClash; // FIXME: 有點怪怪的？
+    return xClash && yClash;
 }
 /** 
  * Choose character.
