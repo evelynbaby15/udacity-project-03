@@ -54,7 +54,7 @@ Enemy.prototype.update = function(dt) {
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    ctx.strokeRect(this.x, this.y + 20, DECTECT_W, DECTECT_H);
+    // ctx.strokeRect(this.x, this.y + 20, DECTECT_W, DECTECT_H);
 };
 
 // Now write your own player class
@@ -80,7 +80,7 @@ Player.prototype.update = function() {
 };
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    ctx.strokeRect(this.x, this.y, DECTECT_W, DECTECT_H);
+    // ctx.strokeRect(this.x, this.y, DECTECT_W, DECTECT_H);
 };
 Player.prototype.backToStart = function() {
     this.xGrid = PLAYER_START_xGrid;
@@ -131,12 +131,13 @@ Player.prototype.handleInput = function(moveDirection) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [];
-allEnemies.push(new Enemy());
-allEnemies.push(new Enemy());
-allEnemies.push(new Enemy());
+for (let i=0; i<3; i++) {
+    // let enemy = new Enemy(-300,40+i*90);
+    let enemy = new Enemy();
+    allEnemies.push(enemy);
+}
 
 var player = new Player();
-
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -209,14 +210,14 @@ Player.prototype.isCollision = function(enemy) {
         }
     }
 
-    // 3.button-left point
+    // 3.bottom-left point
     if(x1 >= ex1 && x1 <= ex2) {
         if(y2 >= ey1 && y2 <= ey2) {
             yClash = true;
         }
     }
 
-    // 4.button-right point
+    // 4.bottom-right point
     if(x2 >= ex1 && x2 <= ex2) {
         if(y2 >= ey1 && y2 <= ey2) {
             yClash = true;
